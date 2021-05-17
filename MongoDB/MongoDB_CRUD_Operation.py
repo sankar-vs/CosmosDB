@@ -11,13 +11,35 @@ import pymongo
 from decouple import config
 from log import logger
 
-class mongoDB:
-
+class MongoDB:
+    '''
+    Class:
+        MongoDB
+    Description:
+        Class to perform Basic CRUD Operations on Cosmos DB MongoDB API
+    Functions:
+        dbConnection()
+        insert_record()
+        update_record()
+        delete_record()
+        read_collection()
+        drop_collection()
+    Variable:
+        None
+    '''
     def __init__(self):
         self.conString = config('conString')
         self.dbConnection()
 
     def dbConnection(self):
+        '''
+        Description:
+            Connection to Azure Cosmos DB
+        Parameter:
+            None
+        Return:
+            None
+        '''
         try:
             self.client = pymongo.MongoClient(self.conString)
             self.db = self.client[config("mydb")]
@@ -28,6 +50,14 @@ class mongoDB:
             logger.exception("Connection Unsuccessfull")
             
     def insert_record(self):
+        '''
+        Description:
+            Insert Reccords from a json file
+        Parameter:
+            None
+        Return:
+            None
+        '''
         try:
             if os.path.isfile("../CosmosDB/MongoDB/resources/book.json"):
                 with open("../CosmosDB/MongoDB/resources/book.json", "r") as f:
@@ -39,6 +69,14 @@ class mongoDB:
             logger.exception("Insertion Unsuccessfull")
 
     def update_record(self):
+        '''
+        Description:
+            Update a record in collections book
+        Parameter:
+            None
+        Return:
+            None
+        '''
         try:
             search = {"bookid": "004"}
             setting = {"$set": {"type": "Fiction"}}
@@ -48,21 +86,30 @@ class mongoDB:
             logger.exception("Update Unsuccessful")
 
     def read_collection(self):
+        '''
+        Description:
+            Read from collections and print the  records
+        Parameter:
+            None
+        Return:
+            None
+        '''
         try:
             logger.info("Printing Records")
             for b in self.col.find():
-                logger.info(b)
+                print(b)
         except Exception:
             logger.exception("Data Unread")
 
-    def drop_collection(self):
-        try:
-            self.col.drop() 
-            logger.info("Drop Collection Successfull")
-        except Exception:
-            logger.exception("Drop Collection Unsuccessfull")
-
     def delete_record(self):
+        '''
+        Description:
+            Delete a record in Collection book
+        Parameter:
+            None
+        Return:
+            None
+        '''
         try:
             search = {"_id": 5}
             self.col.delete_one(search)
@@ -70,9 +117,23 @@ class mongoDB:
         except Exception:
             logger.exception("Delete Record Unsuccessfull")
 
+    def drop_collection(self):
+        '''
+        Description:
+            Drop the created collection in Azure Cosmos DB
+        Parameter:
+            None
+        Return:
+            None
+        '''
+        try:
+            self.col.drop() 
+            logger.info("Drop Collection Successfull")
+        except Exception:
+            logger.exception("Drop Collection Unsuccessfull")
 
 if __name__ == "__main__":
-    obj = mongoDB()
+    obj = MongoDB()
     obj.insert_record()
     obj.update_record()
     obj.delete_record()
